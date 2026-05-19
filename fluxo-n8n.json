@@ -1,0 +1,132 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "assistente-clima",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "75440ee1-7455-4434-9734-a1b2a562167c",
+      "name": "Webhook",
+      "webhookId": "b0edcf93-da6e-4c3f-90f5-f18c2eac3007"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $json.body.latitude }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $json.body.longitude }}"
+            },
+            {
+              "name": "current_weather",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4ae769e3-8d63-4b2c-9868-782305e19e85",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const temp = $('HTTP Request').item.json.current_weather.temperature;\nconst cidade = $('Webhook').item.json.body.cidade;\nlet recomendacao = \"\";\n\nif (temp < 15) {\n    recomendacao = `[IA Simulada] Em ${cidade} está fazendo ${temp}°C. Está bem frio! Recomendo usar um casaco pesado, cachecol e priorizar atividades em locais fechados, como museus ou cafés.`;\n} else if (temp >= 15 && temp <= 25) {\n    recomendacao = `[IA Simulada] O clima em ${cidade} está agradável (${temp}°C). Uma calça leve e uma camiseta/camisa de manga longa são ideais. Perfeito para uma caminhada no parque!`;\n} else {\n    recomendacao = `[IA Simulada] Está calor em ${cidade} (${temp}°C)! Use roupas bem leves, óculos de sol, beba bastante água e aproveite atividades ao ar livre ou uma praia/piscina.`;\n}\n\nreturn { text: recomendacao };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "1c50e6c9-9931-430b-a388-6db0a24ce7d2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"recomendacao\": \"{{ $json.text }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        0
+      ],
+      "id": "981549ac-775b-4aa9-ba40-f2e2ccf7e2ec",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "cc7b6256-f832-41b2-a2db-1a03cd74c9b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f33c63c3f68b46f803bde40afc6c12ca9e29fb1d25d084e8e988cdd26baaf54d"
+  },
+  "id": "vx8eEZOaMGOWDAKy",
+  "tags": []
+}
