@@ -37,3 +37,7 @@ O ecossistema foi projetado utilizando o conceito de microsserviços desacoplado
 * Biblioteca `requests` do Python instalada:
   ```bash
   pip install requests
+
+
+## Estrutura do n8n
+<img width="986" height="286" alt="image" src="https://github.com/user-attachments/assets/84523d3e-04c8-4752-b79e-be0038244a8e" />
